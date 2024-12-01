@@ -1,15 +1,15 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { User, UserRole } from '../types/user';
+import { UserRole } from '../types/user';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: UserRole;
   allowedRoles?: UserRole[];
+  requiredRole?: UserRole;
 }
 
-export function ProtectedRoute({ children, requiredRole, allowedRoles }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, allowedRoles, requiredRole }: ProtectedRouteProps) {
   const { user } = useAuth();
   const location = useLocation();
   const publicPaths = ['/login', '/signup', '/client/quote', '/client/receipt', '/client/order'];

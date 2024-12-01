@@ -21,7 +21,7 @@ export interface Order {
   projectName: string;
   installationAddress: string;
   items: OrderItem[];
-  status: 'order_placed' | 'manufacturing' | 'in_transit' | 'ready_delivery' | 'delivered';
+  status: OrderStatus;
   total: number;
   adjustmentType?: 'discount' | 'surcharge';
   adjustmentPercentage?: number;
@@ -31,6 +31,8 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
 }
+
+export type OrderStatus = 'order_placed' | 'manufacturing' | 'in_transit' | 'ready_delivery' | 'delivered';
 
 export interface ReceiptTemplate {
   businessInfo: {

@@ -131,7 +131,11 @@ export function Quotes() {
                     {user?.role === 'admin' || user?.role === 'sales' ? (
                       <select
                         value={quote.status}
-                        onChange={(e) => handleStatusChange(quote.id!, e.target.value)}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(quote.id!, e.target.value);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
                         className={`text-xs font-semibold rounded-full px-2 py-1 ${getStatusColor(quote.status)} border-none focus:ring-2 focus:ring-indigo-500`}
                       >
                         {statusOptions.map((option) => (

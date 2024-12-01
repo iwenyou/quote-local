@@ -3,19 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, Edit2, Trash2, ShoppingBag } from 'lucide-react';
 import { Order } from '../types/order';
 import { getAllOrders, deleteOrder, updateOrder } from '../services/orderService';
+import { useAuth } from '../contexts/AuthContext';
 import { OrderFilters } from '../components/orders/OrderFilters';
 import { OrderStatusBadge } from '../components/orders/OrderStatusBadge';
 
 const statusOptions = [
-  { value: 'pending', label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
-  { value: 'in_progress', label: 'In Progress', color: 'bg-blue-100 text-blue-800' },
-  { value: 'completed', label: 'Completed', color: 'bg-green-100 text-green-800' },
-  { value: 'cancelled', label: 'Cancelled', color: 'bg-red-100 text-red-800' }
+  { value: 'order_placed', label: 'Order Placed', color: 'bg-yellow-100 text-yellow-800' },
+  { value: 'manufacturing', label: 'Manufacturing', color: 'bg-blue-100 text-blue-800' },
+  { value: 'in_transit', label: 'In Transit', color: 'bg-indigo-100 text-indigo-800' },
+  { value: 'ready_delivery', label: 'Ready for Delivery', color: 'bg-purple-100 text-purple-800' },
+  { value: 'delivered', label: 'Delivered', color: 'bg-green-100 text-green-800' }
 ];
 
 export function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,19 +103,25 @@ export function Orders() {
                     {new Date(order.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <select
-                      value={order.status}
-                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                      className={`text-xs font-semibold rounded-full px-2 py-1 ${getStatusColor(
-                        order.status
-                      )} border-none focus:ring-2 focus:ring-indigo-500`}
-                    >
-                      {statusOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                    {user?.role === 'admin' || user?.role === 'sales' ? (
+                      <select
+                        value={order.status}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(order.id, e.target.value);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className={`text-xs font-semibold rounded-full px-2 py-1 ${getStatusColor(order.status)} border-none focus:ring-2 focus:ring-indigo-500`}
+                      >
+                        {statusOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <OrderStatusBadge status={order.status} />
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     ${order.adjustedTotal?.toFixed(2) || order.total.toFixed(2)}
